@@ -1,0 +1,119 @@
+name: LigaPro Manager - CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # --- ETAPA 1: VALIDACIÓN Y PRUEBAS DEL BACKEND ---
+  backend-ci:
+    name: Backend CI (Node.js & Jest)
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Verify TypeScript Compilation (Strict Type Check)
+        run: |
+          cd backend
+          npm run build
+
+      - name: Run Unit Tests with Coverage (Jest)
+        run: |
+          cd backend
+          npm test
+        env:
+          MONGO_URI: mongodb+srv://admin_user_01:adminsecret26@cluster0.yjlzr.mongodb.net/club_deportivo_test
+          JWT_SECRET: github_actions_temporary_test_secret
+
+  # --- ETAPA 2: VALIDACIÓN Y CONSTRUCCIÓN DEL FRONTEND ---
+  frontend-ci:
+    name: Frontend CI (React & Vite)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Verify Linters and Formatters
+        run: |
+          cd frontend
+          # Si posees reglas de ESLint activadas de producción:
+          # npm run lint
+
+      - name: Build Frontend Application
+        run: |
+          cd frontend
+          npm run build
+        env:
+          VITE_API_URL: http://localhost:5000/api
+
+  # --- ETAPA 3: CONSTRUCCIÓN Y VERIFICACIÓN DE CONTENEDORES ---
+  docker-build:
+    name: Docker Image Compilation
+    needs: [backend-ci, frontend-ci]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Nota: Descomentar e incorporar credenciales en GitHub Secrets si se desea subir a un registro (DockerHub, GHCR)
+      # - name: Log in to Registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false # Cambiar a true una vez configuradas las credenciales de registro
+          tags: ligapro-backend:latest
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false # Cambiar a true una vez configuradas las credenciales de registro
+          tags: ligapro-frontend:latest

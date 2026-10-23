@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/authStore";
+import { useAuthStore } from "@/store/authStore";
 import { Shield, LogOut, TallyFour } from "lucide-react";
 
 export const RootLayout: React.FC = () => {

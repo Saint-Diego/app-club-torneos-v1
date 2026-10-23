@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthStore, UserRole } from "../store/authStore";
+import { useAuthStore, UserRole } from "@/store/authStore";
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];

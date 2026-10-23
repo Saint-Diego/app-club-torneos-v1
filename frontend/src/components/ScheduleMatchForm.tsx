@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import apiClient from "../api/apiClient";
+import apiClient from "@/api/apiClient";
 import { Calendar, MapPin, Clock, AlertTriangle } from "lucide-react";
 
 interface Court {

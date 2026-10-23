@@ -1,14 +1,12 @@
-version: '3.8'
-
 services:
   mongodb:
-    image: mongo:6.0
+    image: mongo:7
     container_name: ligapro_database
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    restart: always
+    restart: unless-stopped
 
   backend:
     build:
@@ -19,12 +17,12 @@ services:
       - "5000:5000"
     environment:
       - PORT=5000
-      - MONGO_URI=mongodb://mongodb:27017/club_deportivo
-      - JWT_SECRET=super_secure_production_secret_key_2026
+      - MONGO_URI=mongodb+srv://admin_user_01:adminsecret26@cluster0.yjlzr.mongodb.net/club_deportivo?retryWrites=true&w=majority
+      - JWT_SECRET=fa1c74076bc52cf10a034b48063c363b99bff247ac36dac846b7c022ea02b2a6
       - NODE_ENV=production
     depends_on:
       - mongodb
-    restart: always
+    restart: unless-stopped
 
   frontend:
     build:
@@ -37,7 +35,7 @@ services:
       - VITE_API_URL=http://localhost:5000/api
     depends_on:
       - backend
-    restart: always
+    restart: unless-stopped
 
 volumes:
   mongo_data:

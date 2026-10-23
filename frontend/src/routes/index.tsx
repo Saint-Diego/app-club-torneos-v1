@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import { RootLayout } from "./RootLayout";
-import { ProtectedRoute } from "../components/ProtectedRoute";
-import { StandingsTable } from "../components/StandingsTable";
-import { MatchReportForm } from "../components/MatchReportForm";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { StandingsTable } from "@/components/StandingsTable";
+import { MatchReportForm } from "@/components/MatchReportForm";
 
 // Componentes Mock locales rápidos para flujos genéricos
 const LoginMock = () => (
