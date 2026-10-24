@@ -1,5 +1,6 @@
 import { Match } from "../models/match.model";
-import { Types } from "mongoose";
+import { Types, type FilterQuery } from "mongoose";
+import type { IMatch } from "../models/match.model";
 
 export class BookingService {
   public static async validateCourtAvailability(
@@ -14,9 +15,9 @@ export class BookingService {
       startTime.getTime() + (durationMinutes + 15) * 60000,
     ); // 15 mins colchón de limpieza/calentamiento
 
-    const query: any = {
+    const query: FilterQuery<IMatch> = {
       venueId: new Types.ObjectId(venueId),
-      courtId: courtId,
+      courtId,
       isPlayed: false,
       scheduledAt: { $lt: endTime },
     };
@@ -29,7 +30,9 @@ export class BookingService {
 
     // Validar intersección de intervalos de tiempo
     for (const match of overlappingMatches) {
-      const matchStart = new Date(match.scheduledAt);
+      if (!match.scheduledAt) continue;
+
+      const matchStart = match.scheduledAt;
       const matchEnd = new Date(
         matchStart.getTime() + (match.durationMinutes || 90) * 60000,
       );

@@ -8,8 +8,8 @@ interface LogParams {
   action: string;
   resource: string;
   resourceId: string;
-  payloadBefore?: any;
-  payloadAfter?: any;
+  payloadBefore?: unknown;
+  payloadAfter?: unknown;
   ipAddress?: string;
 }
 

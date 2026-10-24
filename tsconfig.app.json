@@ -20,7 +20,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    /* Ruta del Alias */
+    "paths": {
+      "@/*": ["./frontend/src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["./frontend/src"],
 }

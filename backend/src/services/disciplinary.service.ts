@@ -1,5 +1,6 @@
 import { Suspension } from "../models/suspension.model";
 import { Match } from "../models/match.model";
+import { Player } from "../models/player.model";
 import { Types } from "mongoose";
 
 export class DisciplinaryService {
@@ -16,13 +17,28 @@ export class DisciplinaryService {
     // Obtener los datos del partido para mapear el equipo del jugador
     const match = await Match.findById(mId);
     if (!match) return;
+    if (!match.homeTeamId || !match.awayTeamId) {
+      throw new Error("El partido debe tener ambos equipos asignados.");
+    }
 
     for (const cardEvent of cards) {
       const pId = new Types.ObjectId(cardEvent.playerId);
+      const player = await Player.findById(pId);
+      if (!player) {
+        throw new Error(`No se encontró al jugador ${cardEvent.playerId}.`);
+      }
 
       // Identificar a qué equipo pertenece el jugador en este encuentro
-      const isHome = match.homeTeamId.toString() === cardEvent.playerId; // Simplificación de flujo o búsqueda
-      const teamId = isHome ? match.homeTeamId : match.awayTeamId;
+      const playerTeamId = player.teamId.toString();
+      const isParticipant =
+        playerTeamId === match.homeTeamId.toString() ||
+        playerTeamId === match.awayTeamId.toString();
+      if (!isParticipant) {
+        throw new Error(
+          `El jugador ${cardEvent.playerId} no pertenece a los equipos del partido.`,
+        );
+      }
+      const teamId = player.teamId;
 
       if (cardEvent.type === "Red") {
         // 1. EXPULSIÓN DIRECTA: Suspensión automática inmediata para la siguiente fecha
@@ -66,6 +82,10 @@ export class DisciplinaryService {
     tournamentId: string,
     roundNumber: number,
   ): Promise<void> {
+    if (!Number.isInteger(roundNumber) || roundNumber < 1) {
+      throw new Error("El número de jornada debe ser un entero positivo.");
+    }
+
     // Al finalizar una jornada, buscamos las suspensiones activas y sumamos una fecha cumplida
     const activeSuspensions = await Suspension.find({
       tournamentId: new Types.ObjectId(tournamentId),

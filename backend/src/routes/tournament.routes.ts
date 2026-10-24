@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router } from "express";
 import { Tournament } from "../models/tournament.model";
 import { ExportService } from "../services/export.service";
 import {
@@ -27,8 +27,12 @@ router.get("/:id/export/pdf", async (req, res): Promise<void> => {
       `attachment; filename=posiciones-${req.params.id}.pdf`,
     );
     res.send(pdfBuffer);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Error al generar el PDF de posiciones.";
+    res.status(500).json({ message });
   }
 });
 
@@ -52,8 +56,12 @@ router.get("/:id/export/excel", async (req, res): Promise<void> => {
       `attachment; filename=analitica-${req.params.id}.xlsx`,
     );
     res.send(excelBuffer);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Error al generar el archivo de análisis en excel.";
+    res.status(500).json({ message });
   }
 });
 export default router;

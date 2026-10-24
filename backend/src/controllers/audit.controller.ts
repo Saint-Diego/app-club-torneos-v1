@@ -23,7 +23,11 @@ export const getSystemLogs = async (
       logs,
       pagination: { total, page, limit, pages: Math.ceil(total / limit) },
     });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al obtener los registros de auditoría.";
+    res.status(500).json({ message });
   }
 };

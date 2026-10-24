@@ -1,6 +1,6 @@
+import "dotenv/config";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import dotenv from "dotenv";
 import { User } from "../models/user.model";
 import { Club } from "../models/club.model";
 import { Team } from "../models/team.model";
@@ -8,8 +8,6 @@ import { Player } from "../models/player.model";
 import { Tournament } from "../models/tournament.model";
 import { Match } from "../models/match.model";
 import { FixtureService } from "../services/fixture.service";
-
-dotenv.config();
 
 const MONGO_URI =
   process.env.MONGO_URI || "mongodb://localhost:27017/club_deportivo";
@@ -36,14 +34,16 @@ const seedDatabase = async () => {
     console.log("👥 Creando credenciales y perfiles de usuarios con roles...");
     const hashedPass = await bcrypt.hash("Password123!", 12);
 
-    const adminUser = await User.create({
+//    const adminUser = 
+    await User.create({
       name: "Super Admin",
       email: "admin@ligapro.com",
       passwordHash: hashedPass,
       role: "Admin",
     });
 
-    const organizadorUser = await User.create({
+//    const organizadorUser = 
+    await User.create({
       name: "Carlos Organizador",
       email: "organizador@ligapro.com",
       passwordHash: hashedPass,

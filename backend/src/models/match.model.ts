@@ -1,12 +1,12 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, Types, model, Document } from "mongoose";
 
 export interface IGoalEvent {
-  playerId: Schema.Types.ObjectId;
+  playerId: Types.ObjectId;
   minute: number;
 }
 
 export interface ICardEvent {
-  playerId: Schema.Types.ObjectId;
+  playerId: Types.ObjectId;
   type: "Yellow" | "Red";
   minute: number;
 }

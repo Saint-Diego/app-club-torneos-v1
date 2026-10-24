@@ -7,8 +7,8 @@ export interface IAuditLog extends Document {
   action: string; // Ej: 'UPDATE_MATCH_REPORT', 'CHANGE_USER_ROLE', 'FORCE_FIXTURE_REGEN'
   resource: string; // Ej: 'Match', 'User', 'Tournament'
   resourceId: Schema.Types.ObjectId;
-  payloadBefore?: any;
-  payloadAfter?: any;
+  payloadBefore?: unknown;
+  payloadAfter?: unknown;
   ipAddress?: string;
   createdAt: Date;
 }

@@ -15,11 +15,11 @@ export class FixtureService {
     teams: Types.ObjectId[],
     type: "Corto" | "Largo",
   ): Round[] {
-    const list = [...teams];
+    const list: (Types.ObjectId | null)[] = [...teams];
     const hasGhost = list.length % 2 !== 0;
 
     if (hasGhost) {
-      list.push(null as any); // Representa un "Bye" para jornadas impares
+      list.push(null); // Representa un "Bye" para jornadas impares
     }
 
     const numTeams = list.length;

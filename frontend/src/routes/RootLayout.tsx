@@ -1,10 +1,10 @@
 import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
-import { Shield, LogOut, TallyFour } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import { Shield, LogOut, LogIn } from "lucide-react";
 
 export const RootLayout: React.FC = () => {
-  const { user, logout } = useAuthStore();
+  const { user, logout, hasRole, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -29,9 +29,9 @@ export const RootLayout: React.FC = () => {
           >
             Posiciones
           </Link>
-          {user && (
+          {isAuthenticated && user && (
             <>
-              {(user.role === "Admin" || user.role === "Organizador") && (
+              {hasRole(["Admin", "Organizador"]) && (
                 <Link
                   to="/admin/report"
                   className="hover:text-emerald-400 transition-colors"
@@ -45,13 +45,19 @@ export const RootLayout: React.FC = () => {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="p-1.5 bg-slate-800 hover:bg-red-900 rounded-lg text-slate-300 hover:text-white transition-colors"
+                  className="p-1.5 bg-slate-800 hover:bg-red-900 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             </>
           )}
+          <Link
+            to="/login"
+            className="p-2 bg-slate-800 hover:bg-emerald-600 rounded-3xl text-slate-300 hover:text-white transition-colors cursor-pointer"
+          >
+            <LogIn className="w-4 h-4" />
+          </Link>
         </nav>
       </header>
       <main className="flex-grow p-6 max-w-7xl w-full mx-auto">

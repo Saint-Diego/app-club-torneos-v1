@@ -5,6 +5,7 @@ import { validateBody } from "../middlewares/validate.middleware";
 import { MatchReportSchema } from "../schemas/validation.schemas";
 
 const router = Router();
+
 router.post(
   "/:matchId/report",
   protect,

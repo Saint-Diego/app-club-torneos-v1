@@ -41,9 +41,11 @@ export const scheduleMatchLocation = async (
         message: "Partido programado exitosamente sin conflictos.",
         match,
       });
-  } catch (error: any) {
-    res.status(500).json({
-      message: error instanceof Error ? error.message : String(error),
-    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al programar la ubicación del partido.";
+    res.status(500).json({ message });
   }
 };

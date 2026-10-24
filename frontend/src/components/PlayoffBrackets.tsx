@@ -2,12 +2,18 @@ import React, { useEffect, useState } from "react";
 import apiClient from "@/api/apiClient";
 import { GitFork, Shield } from "lucide-react";
 
+interface PlayoffTeam {
+  _id: string;
+  name: string;
+  shieldUrl?: string;
+}
+
 interface PlayoffMatch {
   _id: string;
   phase: "Cuartos" | "Semifinal" | "Final";
   matchCode: string;
-  homeTeamId: { name: string; shieldUrl?: string } | null;
-  awayTeamId: { name: string; shieldUrl?: string } | null;
+  homeTeamId: PlayoffTeam | null;
+  awayTeamId: PlayoffTeam | null;
   homeGoals: number;
   awayGoals: number;
   winnerTeamId: string | null;
@@ -43,7 +49,7 @@ export const PlayoffBrackets: React.FC<{ tournamentId: string }> = ({
     goals,
     isWinner,
   }: {
-    team: any;
+    team: PlayoffTeam | null;
     goals: number;
     isWinner: boolean;
   }) => (
@@ -83,12 +89,12 @@ export const PlayoffBrackets: React.FC<{ tournamentId: string }> = ({
               <TeamRow
                 team={m.homeTeamId}
                 goals={m.homeGoals}
-                isWinner={m.winnerTeamId === (m.homeTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.homeTeamId?._id}
               />
               <TeamRow
                 team={m.awayTeamId}
                 goals={m.awayGoals}
-                isWinner={m.winnerTeamId === (m.awayTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.awayTeamId?._id}
               />
             </div>
           ))}
@@ -107,12 +113,12 @@ export const PlayoffBrackets: React.FC<{ tournamentId: string }> = ({
               <TeamRow
                 team={m.homeTeamId}
                 goals={m.homeGoals}
-                isWinner={m.winnerTeamId === (m.homeTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.homeTeamId?._id}
               />
               <TeamRow
                 team={m.awayTeamId}
                 goals={m.awayGoals}
-                isWinner={m.winnerTeamId === (m.awayTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.awayTeamId?._id}
               />
             </div>
           ))}
@@ -131,12 +137,12 @@ export const PlayoffBrackets: React.FC<{ tournamentId: string }> = ({
               <TeamRow
                 team={m.homeTeamId}
                 goals={m.homeGoals}
-                isWinner={m.winnerTeamId === (m.homeTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.homeTeamId?._id}
               />
               <TeamRow
                 team={m.awayTeamId}
                 goals={m.awayGoals}
-                isWinner={m.winnerTeamId === (m.awayTeamId as any)?._id}
+                isWinner={m.winnerTeamId === m.awayTeamId?._id}
               />
             </div>
           ))}

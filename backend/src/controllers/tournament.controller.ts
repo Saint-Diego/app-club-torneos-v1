@@ -52,8 +52,12 @@ export const createTournament = async (
     res
       .status(201)
       .json({ message: "Torneo y Fixture creados con éxito", tournament });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al crear el torneo.";
+    res.status(500).json({ message });
   }
 };
 
@@ -72,7 +76,11 @@ export const getTournamentStandings = async (
       return;
     }
     res.status(200).json(tournament.standings);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al obtener las posiciones del torneo.";
+    res.status(500).json({ message });
   }
 };

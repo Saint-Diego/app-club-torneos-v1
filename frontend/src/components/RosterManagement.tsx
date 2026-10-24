@@ -6,8 +6,8 @@ import apiClient from "@/api/apiClient";
 import {
   Users,
   UserPlus,
-  Shield,
-  ClipboardList,
+  //  Shield,
+  //  ClipboardList,
   Trash2,
   AlertCircle,
 } from "lucide-react";
@@ -39,7 +39,8 @@ const RosterMemberSchema = z
     },
   );
 
-type RosterMemberFormData = z.infer<typeof RosterMemberSchema>;
+type RosterMemberFormInput = z.input<typeof RosterMemberSchema>;
+type RosterMemberFormData = z.output<typeof RosterMemberSchema>;
 
 interface Member {
   _id: string;
@@ -63,7 +64,7 @@ export const RosterManagement: React.FC<{ teamId: string }> = ({ teamId }) => {
     watch,
     reset,
     formState: { errors },
-  } = useForm<RosterMemberFormData>({
+  } = useForm<RosterMemberFormInput, unknown, RosterMemberFormData>({
     resolver: zodResolver(RosterMemberSchema),
     defaultValues: { role: "Jugador" },
   });
@@ -75,8 +76,12 @@ export const RosterManagement: React.FC<{ teamId: string }> = ({ teamId }) => {
     try {
       const response = await apiClient.get(`/teams/${teamId}/roster`);
       setMembers(response.data);
-    } catch (err: any) {
-      setError("No se pudo cargar la plantilla del equipo.");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "No se pudo cargar la plantilla del equipo.",
+      );
     } finally {
       setLoading(false);
     }
@@ -94,8 +99,8 @@ export const RosterManagement: React.FC<{ teamId: string }> = ({ teamId }) => {
       setSuccess("Miembro agregado exitosamente a la plantilla.");
       reset();
       fetchRoster();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Error al registrar el miembro.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al registrar el miembro.");
     }
   };
 
@@ -108,8 +113,8 @@ export const RosterManagement: React.FC<{ teamId: string }> = ({ teamId }) => {
       await apiClient.delete(`/teams/${teamId}/roster/${memberId}`);
       setSuccess("Miembro removido con éxito.");
       fetchRoster();
-    } catch (err: any) {
-      setError("Error al remover el miembro.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al remover el miembro.");
     }
   };
 

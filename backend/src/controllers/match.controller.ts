@@ -1,17 +1,21 @@
-import { Response } from "express";
+import type { Response } from "express";
+import { Types } from "mongoose";
+import { z } from "zod";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Match } from "../models/match.model";
 import { Tournament } from "../models/tournament.model";
 import { Player } from "../models/player.model";
+import { MatchReportSchema } from "../schemas/validation.schemas";
 
-export const submitMatchReportAdvanced = async (
+type MatchReportBody = z.infer<typeof MatchReportSchema>;
+
+export const submitMatchReport = async (
   req: AuthRequest,
   res: Response,
 ): Promise<void> => {
   try {
     const { matchId } = req.params;
-    const { homeGoals, awayGoals, events } = req.body;
-    // events contiene: goals: Array<{ playerId: string, minute: number }>, cards: ...
+    const { homeGoals, awayGoals, events } = req.body as MatchReportBody;
 
     const match = await Match.findById(matchId);
     if (!match || match.isPlayed) {
@@ -23,11 +27,14 @@ export const submitMatchReportAdvanced = async (
       return;
     }
 
-    match.homeGoals = homeGoals;
-    match.awayGoals = awayGoals;
-    match.events = events;
-    match.isPlayed = true;
-    await match.save();
+    const homeTeamId = match.homeTeamId;
+    const awayTeamId = match.awayTeamId;
+    if (!homeTeamId || !awayTeamId) {
+      res.status(400).json({
+        message: "El encuentro aún no tiene ambos equipos asignados.",
+      });
+      return;
+    }
 
     const tournament = await Tournament.findById(match.tournamentId);
     if (!tournament) {
@@ -44,7 +51,7 @@ export const submitMatchReportAdvanced = async (
       outcome: "w" | "d" | "l",
     ) => {
       const row = tournament.standings.find(
-        (s) => s.teamId.toString() === teamId.toString(),
+        (s) => s.teamId.toString() === teamId,
       );
       if (row) {
         row.played += 1;
@@ -61,14 +68,14 @@ export const submitMatchReportAdvanced = async (
     const hPts = homeGoals > awayGoals ? 3 : homeGoals === awayGoals ? 1 : 0;
     const aPts = awayGoals > homeGoals ? 3 : homeGoals === awayGoals ? 1 : 0;
     updateStanding(
-      match.homeTeamId.toString(),
+      homeTeamId.toString(),
       homeGoals,
       awayGoals,
       hPts,
       homeGoals > awayGoals ? "w" : homeGoals === awayGoals ? "d" : "l",
     );
     updateStanding(
-      match.awayTeamId.toString(),
+      awayTeamId.toString(),
       awayGoals,
       homeGoals,
       aPts,
@@ -86,7 +93,7 @@ export const submitMatchReportAdvanced = async (
           scorerRow.goals += 1;
         } else {
           tournament.topScorers.push({
-            playerId: player._id as any,
+            playerId: player._id,
             teamId: player.teamId,
             goals: 1,
           });
@@ -110,7 +117,7 @@ export const submitMatchReportAdvanced = async (
           gkRow.minutesPlayed += 90; // Duración estándar por partido reglamentario
         } else {
           tournament.bestGoalkeepers.push({
-            playerId: goalkeeper._id as any,
+            playerId: goalkeeper._id,
             teamId: goalkeeper.teamId,
             goalsConceded,
             minutesPlayed: 90,
@@ -119,8 +126,8 @@ export const submitMatchReportAdvanced = async (
       }
     };
 
-    await registerCleanSheetStats(match.homeTeamId.toString(), awayGoals);
-    await registerCleanSheetStats(match.awayTeamId.toString(), homeGoals);
+    await registerCleanSheetStats(homeTeamId.toString(), awayGoals);
+    await registerCleanSheetStats(awayTeamId.toString(), homeGoals);
 
     // Ordenaciones lógicas analíticas
     tournament.standings.sort(
@@ -131,6 +138,20 @@ export const submitMatchReportAdvanced = async (
       (a, b) => a.goalsConceded - b.goalsConceded,
     );
 
+    match.homeGoals = homeGoals;
+    match.awayGoals = awayGoals;
+    match.events = {
+      goals: events.goals.map((goal) => ({
+        ...goal,
+        playerId: new Types.ObjectId(goal.playerId),
+      })),
+      cards: events.cards.map((card) => ({
+        ...card,
+        playerId: new Types.ObjectId(card.playerId),
+      })),
+    };
+    match.isPlayed = true;
+    await match.save();
     await tournament.save();
     res
       .status(200)
@@ -138,7 +159,11 @@ export const submitMatchReportAdvanced = async (
         message: "Módulos analíticos de torneos calculados y consolidados.",
         tournament,
       });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error procesando el acta del partido.";
+    res.status(500).json({ message });
   }
 };

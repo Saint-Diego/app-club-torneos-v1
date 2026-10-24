@@ -53,8 +53,8 @@ export const ScheduleMatchForm: React.FC<{
         durationMinutes: duration,
       });
       onScheduleSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Error al agendar la cancha.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Error al agendar la cancha.");
     } finally {
       setSubmitting(false);
     }

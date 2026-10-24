@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    /* Opciones Principales del Lenguaje */
+    "target": "ES2022",
+    "module": "node16",
+    "lib": ["ES2022"],
+    "allowJs": false,
+    "removeComments": true,
+    
+    /* Configuración de Directorios de Salida y Entrada */
+    "outDir": "./dist",
+    "rootDir": "./src",
+    
+    /* Reglas de Tipado Estricto (Clean Code) */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    
+    /* Análisis de Código y Buenas Prácticas */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    
+    /* Resolución de Módulos */
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    
+    /* Ajustes del Entorno de Compilación */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "src/__tests__/**/*.test.ts"]
+}

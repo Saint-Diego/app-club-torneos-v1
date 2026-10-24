@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "@/api/apiClient";
-import { Eye, ShieldAlert, User, Terminal } from "lucide-react";
+import { ShieldAlert, User, Terminal } from "lucide-react";
 
 interface SystemLog {
   _id: string;
@@ -14,22 +14,36 @@ interface SystemLog {
 
 export const AuditLogPanel: React.FC = () => {
   const [logs, setLogs] = useState<SystemLog[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [loadedPage, setLoadedPage] = useState<number | null>(null);
+  const loading = loadedPage !== page;
 
   useEffect(() => {
-    setLoading(true);
+    let isCurrentRequest = true;
+
     apiClient
       .get(`/audit-logs?page=${page}&limit=20`)
       .then((res) => {
+        if (!isCurrentRequest) return;
+
         setLogs(res.data.logs);
         setTotalPages(res.data.pagination.pages);
       })
-      .catch((err) =>
-        console.error("Error cargando bitácora de seguridad:", err),
-      )
-      .finally(() => setLoading(false));
+      .catch((err: unknown) => {
+        if (isCurrentRequest) {
+          console.error("Error cargando bitácora de seguridad:", err);
+        }
+      })
+      .finally(() => {
+        if (isCurrentRequest) {
+          setLoadedPage(page);
+        }
+      });
+
+    return () => {
+      isCurrentRequest = false;
+    };
   }, [page]);
 
   if (loading && page === 1)

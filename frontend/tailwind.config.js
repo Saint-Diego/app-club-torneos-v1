@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: {
+    relative: true,
+    files: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  },
   theme: {
     extend: {
       // Extensión de la paleta corporativa si el club deportivo requiere colores institucionales

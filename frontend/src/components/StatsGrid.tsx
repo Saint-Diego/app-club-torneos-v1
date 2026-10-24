@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Goal, AlertCircle, CalendarClock } from "lucide-react";
+import { Goal, AlertCircle, CalendarClock } from "lucide-react";
 
 interface StatsGridProps {
   totalMatches: number;

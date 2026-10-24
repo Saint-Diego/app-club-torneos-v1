@@ -24,7 +24,11 @@ export const submitPlayoffReport = async (
         status: "success",
         message: "Resultado de llave guardado y progresión calculada.",
       });
-  } catch (error: any) {
-    res.status(400).json({ status: "fail", message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al enviar el informe de la llave.";
+    res.status(400).json({ status: "fail", message });
   }
 };

@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, Types, model, Document } from "mongoose";
 
 export interface IStandingRow {
   teamId: Schema.Types.ObjectId;
@@ -13,13 +13,13 @@ export interface IStandingRow {
 }
 
 export interface IScorerRow {
-  playerId: Schema.Types.ObjectId;
+  playerId: Types.ObjectId;
   teamId: Schema.Types.ObjectId;
   goals: number;
 }
 
 export interface IGoalkeeperRow {
-  playerId: Schema.Types.ObjectId;
+  playerId: Types.ObjectId;
   teamId: Schema.Types.ObjectId;
   goalsConceded: number;
   minutesPlayed: number;

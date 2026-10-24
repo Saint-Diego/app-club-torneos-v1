@@ -28,9 +28,11 @@ export const MatchReportForm: React.FC<MatchReportFormProps> = ({
         events: { goals: [], cards: [] }, // Eventos simplificados estructurados para el envío inicial obligatorio
       });
       onReportSuccess();
-    } catch (error: any) {
+    } catch (err: unknown) {
       setErrorMessage(
-        error.response?.data?.message || "Error procesando el acta digital.",
+        err instanceof Error
+          ? err.message
+          : "Error procesando el acta digital.",
       );
     } finally {
       setIsSubmitting(false);

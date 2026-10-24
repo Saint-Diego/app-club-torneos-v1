@@ -1,5 +1,5 @@
-import { MatchPlayoff } from "../models/match.model";
-import { Types } from "mongoose";
+import { Match } from "../models/match.model";
+import { Schema } from "mongoose";
 
 export class PlayoffService {
   public static async advanceWinner(
@@ -9,10 +9,16 @@ export class PlayoffService {
     hP: number = 0,
     aP: number = 0,
   ): Promise<void> {
-    const match = await MatchPlayoff.findById(matchId);
+    const match = await Match.findOne({ _id: matchId, isPlayoff: true });
     if (!match) throw new Error("Partido de playoff no encontrado.");
+    if (match.isPlayed) {
+      throw new Error("El partido de playoff ya fue finalizado.");
+    }
+    if (!match.homeTeamId || !match.awayTeamId) {
+      throw new Error("El partido de playoff debe tener ambos equipos asignados.");
+    }
 
-    let winnerId: Types.ObjectId;
+    let winnerId: Schema.Types.ObjectId;
 
     if (hG > aG) {
       winnerId = match.homeTeamId!;
@@ -39,9 +45,10 @@ export class PlayoffService {
     if (!match.nextMatchCode) return;
 
     // Buscar el siguiente partido donde debe insertarse el ganador
-    const nextMatch = await MatchPlayoff.findOne({
+    const nextMatch = await Match.findOne({
       tournamentId: match.tournamentId,
       matchCode: match.nextMatchCode,
+      isPlayoff: true,
     });
 
     if (nextMatch) {

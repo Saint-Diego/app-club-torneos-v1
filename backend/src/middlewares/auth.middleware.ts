@@ -30,8 +30,12 @@ export const protect = (
     ) as { id: string; role: UserRole };
     req.user = { id: decoded.id, role: decoded.role };
     next();
-  } catch (err) {
-    res.status(401).json({ message: "Token inválido o expirado." });
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Error al verificar el token.";
+    res.status(401).json({ message });
   }
 };
 

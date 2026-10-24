@@ -16,7 +16,11 @@ export const getActiveSuspensions = async (
       .populate("teamId", "name");
 
     res.status(200).json(suspensions);
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al obtener las suspensiones activas.";
+    res.status(500).json({ message });
   }
 };

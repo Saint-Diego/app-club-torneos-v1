@@ -16,8 +16,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     res
       .status(201)
       .json({ message: "Usuario registrado correctamente.", userId: user._id });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al registrar el usuario.";
+    res.status(500).json({ message });
   }
 };
 
@@ -34,18 +38,20 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       process.env.JWT_SECRET || "fallback_secret",
       { expiresIn: "8h" },
     );
-    res
-      .status(200)
-      .json({
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      });
-  } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Error al iniciar sesión.";
+    res.status(500).json({ message });
   }
 };
