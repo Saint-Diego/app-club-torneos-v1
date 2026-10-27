@@ -10,7 +10,7 @@ import { morganMiddleware } from './middlewares/morgan.middleware';
 const app: Application = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // Inyección del logger de tráfico de red HTTP

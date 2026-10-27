@@ -15,53 +15,55 @@ export class FixtureService {
     teams: Types.ObjectId[],
     type: "Corto" | "Largo",
   ): Round[] {
-    const list: (Types.ObjectId | null)[] = [...teams];
-    const hasGhost = list.length % 2 !== 0;
+    if (!teams.length) return [];
 
-    if (hasGhost) {
-      list.push(null); // Representa un "Bye" para jornadas impares
+    const list: (Types.ObjectId | null)[] = [...teams];
+    if (list.length % 2 !== 0) {
+      list.push(null);
     }
 
-    const numTeams = list.length;
-    const roundsCount = numTeams - 1;
-    const matchesPerRound = numTeams / 2;
+    const totalTeams = list.length;
     const fixture: Round[] = [];
 
-    for (let r = 0; r < roundsCount; r++) {
-      const currentRoundMatches: MatchSlot[] = [];
-      for (let m = 0; m < matchesPerRound; m++) {
-        const homeIndex = (r + m) % (numTeams - 1);
-        let awayIndex = (numTeams - 1 - m + r) % (numTeams - 1);
+    for (let roundIndex = 0; roundIndex < totalTeams - 1; roundIndex++) {
+      const matches: MatchSlot[] = [];
 
-        if (m === 0) {
-          awayIndex = numTeams - 1;
+      for (let matchIndex = 0; matchIndex < totalTeams / 2; matchIndex++) {
+        const homeIndex = (roundIndex + matchIndex) % (totalTeams - 1);
+        let awayIndex =
+          (totalTeams - 1 - matchIndex + roundIndex) % (totalTeams - 1);
+
+        if (matchIndex === 0) {
+          awayIndex = totalTeams - 1;
         }
 
         const home = list[homeIndex];
         const away = list[awayIndex];
 
-        if (home !== null && away !== null) {
-          // Alternar localía en cada jornada
-          if (r % 2 === 0) {
-            currentRoundMatches.push({ home, away });
-          } else {
-            currentRoundMatches.push({ home: away, away: home });
-          }
+        if (home && away) {
+          matches.push(
+            roundIndex % 2 === 0 ? { home, away } : { home: away, away: home },
+          );
         }
       }
-      fixture.push({ roundNumber: r + 1, matches: currentRoundMatches });
+
+      fixture.push({
+        roundNumber: roundIndex + 1,
+        matches,
+      });
     }
 
-    // Si es tipo Largo (Ida y vuelta) replicamos invirtiendo la localía
     if (type === "Largo") {
-      const secondLegCount = fixture.length;
-      for (let r = 0; r < secondLegCount; r++) {
-        const mirroredMatches = fixture[r].matches.map((m) => ({
-          home: m.away,
-          away: m.home,
+      const firstLegLength = fixture.length;
+
+      for (let roundIndex = 0; roundIndex < firstLegLength; roundIndex++) {
+        const mirroredMatches = fixture[roundIndex].matches.map((match) => ({
+          home: match.away,
+          away: match.home,
         }));
+
         fixture.push({
-          roundNumber: secondLegCount + r + 1,
+          roundNumber: firstLegLength + roundIndex + 1,
           matches: mirroredMatches,
         });
       }
