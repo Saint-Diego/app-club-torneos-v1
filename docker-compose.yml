@@ -16,6 +16,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: ligapro_backend
+    ports:
+      - "5000:5000"
     environment:
       PORT: 5000
       MONGO_URI: mongodb+srv://admin_user_01:adminsecret26@cluster0.yjlzr.mongodb.net/club_deportivo?retryWrites=true&w=majority
