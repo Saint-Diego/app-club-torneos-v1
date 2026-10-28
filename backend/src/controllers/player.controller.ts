@@ -3,6 +3,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { Match } from "../models/match.model";
 import { Player } from "../models/player.model";
 import { Suspension } from "../models/suspension.model";
+import { ITeam } from "../models/team.model";
 import { Types } from "mongoose";
 
 export const getPlayerProfile = async (
@@ -15,7 +16,7 @@ export const getPlayerProfile = async (
 
     const player = await Player.findById(pId)
       .populate("userId", "name email")
-      .populate("teamId", "name shieldUrl");
+      .populate<{ teamId: ITeam }>("teamId", "name shieldUrl");
 
     if (!player) {
       res.status(404).json({ message: "Jugador no encontrado." });

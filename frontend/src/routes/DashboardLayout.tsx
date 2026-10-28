@@ -95,7 +95,7 @@ export const DashboardLayout: React.FC = () => {
     // Seguridad y Control Superior
     {
       to: "/dashboard/users",
-      label: "Dar de Alta Usuario",
+      label: "Registrar Usuario",
       icon: UserPlus,
       roles: ["Admin"],
     },

@@ -43,14 +43,14 @@ export const AnalyticsDashboard: React.FC<{ tournamentId: string }> = ({
 
   const downloadPDF = () => {
     window.open(
-      `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/tournaments/${tournamentId}/export/pdf`,
+      `${import.meta.env.VITE_API_URL || "/api"}/tournaments/${tournamentId}/export/pdf`,
       "_blank",
     );
   };
 
   const downloadExcel = () => {
     window.open(
-      `${import.meta.env.VITE_API_URL || "http://localhost:5000/api"}/tournaments/${tournamentId}/export/excel`,
+      `${import.meta.env.VITE_API_URL || "/api"}/tournaments/${tournamentId}/export/excel`,
       "_blank",
     );
   };
